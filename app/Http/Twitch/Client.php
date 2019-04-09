@@ -43,20 +43,40 @@ class Client extends GuzzleClient
         return json_decode($response)->data[0] ?? null;
     }
 
-    public function submitToWebhookStreamChanged(stdClass $user, int $leaseSeconds = 86400): bool
+    protected function requestSubmitToWebhook(array $params = [], int $leaseSeconds = 864000): bool
     {
-        $form_params = [
-            'hub.callback' => route('twitch.webhook'),
+        $headers = ['Client-ID' => $this->clientId];
+
+        $defaultParams = [
             'hub.mode' => 'subscribe',
-            'hub.topic' => "{$this->helixBaseUrl}/streams?user_id={$user->id}",
             'hub.lease_seconds' => "{$leaseSeconds}",
             'hub.secret' => config('app.webhooks_signature_secret'),
         ];
 
-        $headers = ['Client-ID' => $this->clientId];
+        $form_params  = array_merge($defaultParams, $params);
 
         $response = $this->request('POST', "{$this->helixBaseUrl}/webhooks/hub", compact('form_params', 'headers'));
 
         return $response->getStatusCode() == Response::HTTP_ACCEPTED;
+    }
+
+    public function submitToWebhookNewFollower(stdClass $user, int $leaseSeconds = 86400): bool
+    {
+        $params = [
+            'hub.topic' => "{$this->helixBaseUrl}/users/follows?first=1&to_id={$user->id}",
+            'hub.callback' => route('twitch.webhook') . "?user_id={$user->id}",
+        ];
+
+        return $this->requestSubmitToWebhook($params, $leaseSeconds);
+    }
+
+    public function submitToWebhookStreamChanged(stdClass $user, int $leaseSeconds = 86400): bool
+    {
+        $params = [
+            'hub.topic' => "{$this->helixBaseUrl}/streams?user_id={$user->id}",
+            'hub.callback' => route('twitch.webhook') . "?user_id={$user->id}",
+        ];
+
+        return $this->requestSubmitToWebhook($params, $leaseSeconds);
     }
 }

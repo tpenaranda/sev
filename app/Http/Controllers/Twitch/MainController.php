@@ -15,11 +15,11 @@ class MainController extends Controller
         $favorite_streamer = $request->streamer;
 
         if (empty($user = $client->getUserObjectByUsername($favorite_streamer))) {
-            return response()->json(['error' => 'Username not found.'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => 'Username not found'], Response::HTTP_BAD_REQUEST);
         }
 
-        if (!$client->submitToWebhookStreamChanged($user)) {
-            return response()->json(['error' => "Sorry, can't create the event listener right now"], Response::HTTP_NOT_ACCEPTABLE);
+        if (!$client->submitToWebhookStreamChanged($user) || !$client->submitToWebhookNewFollower($user)) {
+            return response()->json(['error' => "Sorry, can't subscribe to {$favorite_streamer} webhooks right now"], Response::HTTP_NOT_ACCEPTABLE);
         }
 
         session(compact('favorite_streamer'));
@@ -34,9 +34,11 @@ class MainController extends Controller
 
     public function verifyWebhook(Request $request)
     {
-        Log::info('Verify requested!');
+        Log::info('Webhook verification requested');
 
-        return response($request->get('hub_challenge', ''));
+        Log::info($request);
+
+        return response($request->get('hub_challenge', ''), Response::HTTP_ACCEPTED);
     }
 
     public function receiveWebhook(Request $request)
