@@ -34,11 +34,9 @@ class MainController extends Controller
 
     public function verifyWebhook(Request $request)
     {
-        Log::info('Verify');
-        Log::info($request);
-        Log::info($request->get('hub_challenge'));
+        Log::info('Verify requested!');
 
-        return response();
+        return response($request->get('hub_challenge', ''));
     }
 
     public function receiveWebhook(Request $request)
