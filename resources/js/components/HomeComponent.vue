@@ -24,6 +24,17 @@
                     <div id="livestream"></div>
                 </div>
             </div>
+            <div class="card col-md-8 px-0 mt-3" v-if="webhooks.length">
+                <div class="card-header">
+                    <span>Logged Events (Server side)</span>
+                    <button class="btn-primary ml-2 px-4" @click="pullWebhookLogs">Refresh</button>
+                </div>
+                <div class="card-body">
+                    <div v-for="webhook in webhooks">
+                        <i>{{ webhook.done_at  }}</i> {{ webhook.description }}
+                    </div>
+                </div>
+            </div>
             <div v-if="accessToken && chat.enabled" class="card col-md-8 px-0 mt-3">
                 <div class="card-header">
                     <span>Chat</span>
@@ -42,15 +53,6 @@
                         <input type="text" class="text-right" v-model="chat.message" name="chat_message" maxlength="64" size="64">
                         <button class="btn-primary" @click="sendChatMessage" :disabled="!chat.message">Send!</button>
                     </div>
-                </div>
-            </div>
-            <div class="card col-md-8 px-0 mt-3" v-if="webhooks.length">
-                <div class="card-header">
-                    <span>Logged Events (Server side)</span>
-                    <button class="btn-primary ml-2 px-4" @click="pullWebhookLogs">Refresh</button>
-                </div>
-                <div class="card-body">
-                    WIP
                 </div>
             </div>
         </div>

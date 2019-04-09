@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Twitch;
 
 use App\Http\Controllers\Controller;
 use App\Http\Twitch\Client;
+use Carbon\Carbon;
 use Illuminate\Http\{Request, Response};
 use Log, Redis;
 
@@ -36,10 +37,10 @@ class MainController extends Controller
     protected function logStreamChangedEvent(int $userId, array $data = [])
     {
         if (!empty($data[0]['type']) && $data[0]['type'] === 'live') {
-            $description = 'Stream went online';
-            $done_at = $data[0]['started_at'];
+            $description = 'Streamer went online';
+            $done_at = Carbon::parse($data[0]['started_at'])->format('c');
         } else {
-            $description = 'Stream went offline';
+            $description = 'Streamer went offline';
             $done_at = now()->format('c');
         }
 
@@ -49,7 +50,7 @@ class MainController extends Controller
     protected function logNewFollowerEvent(int $userId, array $data = [])
     {
         $description = "Streamer is now followed by username {$data[0]['from_name']}";
-        $done_at = $data[0]['followed_at'];
+        $done_at = Carbon::parse($data[0]['followed_at'])->format('c');
 
         return $this->logEvent($userId, compact('description', 'done_at'));
     }
@@ -87,7 +88,7 @@ class MainController extends Controller
 
         $events = Redis::lrange("webhook_events_user_id:{$userId}", 0, 9);
 
-        return response()->json(['data' => $events]);
+        return response()->json(['data' => array_map(function ($i) { return json_decode($i); }, $events)]);
     }
 
     public function verifyWebhook(Request $request)
