@@ -100,7 +100,7 @@
         },
         methods: {
             pullWebhookLogs () {
-                axios.get('/listen').then((response) => {
+                axios.get('/twitch/listen').then((response) => {
                     this.webhooks = response.data.data
                 }).catch((error) => {
                     this.webhooks = []
