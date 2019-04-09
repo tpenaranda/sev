@@ -44,6 +44,15 @@
                     </div>
                 </div>
             </div>
+            <div class="card col-md-8 px-0 mt-3" v-if="webhooks.length">
+                <div class="card-header">
+                    <span>Logged Events (Server side)</span>
+                    <button class="btn-primary ml-2 px-4" @click="pullWebhookLogs">Refresh</button>
+                </div>
+                <div class="card-body">
+                    WIP
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -73,11 +82,13 @@
                 livestream: {
                     show: false,
                     player: null
-                }
+                },
+                webhooks: []
             }
         },
         mounted () {
             this.instanceChatClient()
+            this.pullWebhookLogs()
         },
         computed: {
             connect_button_text () {
@@ -88,6 +99,13 @@
             }
         },
         methods: {
+            pullWebhookLogs () {
+                axios.get('/twitch/webhooks').then((response) => {
+                    this.webhooks = response.data.data
+                }).catch((error) => {
+                    this.webhooks = []
+                })
+            },
             instanceLiveStream (channel) {
                 this.livestream.player = new Twitch.Player('livestream', {width: 640, height: 480, channel: channel})
             },
@@ -106,7 +124,7 @@
                         clientId: this.clientId,
                     },
                     identity: {
-                        username: 'WillyWonka3223',
+                        username: 'You',
                         password: `oauth:${this.accessToken}`
                     },
                     channels: [ this.streamer ]
@@ -139,7 +157,7 @@
                             this.appendChatMessage(userstate['username'], message)
                             break;
                         default:
-                            this.appendChatMessage(' - Event - ', `MessageType => ${userstate['message-type']}`)
+                            console.log(channel, userstate, message)
                             break;
                     }
                 });

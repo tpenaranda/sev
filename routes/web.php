@@ -25,6 +25,9 @@ Route::group(['namespace' => 'Twitch'], function () {
     // Webhooks
     Route::group(['prefix' => 'twitch'], function () {
         Route::post('listen', 'MainController@listen');
-        Route::match(['post', 'get'], 'webhooks', 'MainController@handleWebhook')->name('twitch.webhook');
+        Route::group(['prefix' => 'webhooks'], function () {
+            Route::get('', 'MainController@getWebhooks');
+            Route::post('', 'MainController@receiveWebhook')->name('twitch.webhook');
+        });
     });
 });

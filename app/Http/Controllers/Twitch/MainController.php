@@ -9,11 +9,16 @@ use Log;
 
 class MainController extends Controller
 {
-    public function handleWebhook(Request $request)
+    public function receiveWebhook(Request $request)
     {
         Log::info($request);
 
         return response($request->get('hub.challenge'));
+    }
+
+    public function getWebhooks(Request $request)
+    {
+        return response()->json(['data' => []]);
     }
 
     public function listen(Request $request)
