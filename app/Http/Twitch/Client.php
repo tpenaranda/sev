@@ -49,7 +49,7 @@ class Client extends GuzzleClient
             'hub.callback' => route('twitch.webhook'),
             'hub.mode' => 'subscribe',
             'hub.topic' => "{$this->helixBaseUrl}/streams?user_id={$user->id}",
-            'hub.lease_seconds' => $leaseSeconds,
+            'hub.lease_seconds' => "{$leaseSeconds}",
             'hub.secret' => config('app.webhooks_signature_secret'),
         ];
 
