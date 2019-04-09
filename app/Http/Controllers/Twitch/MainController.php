@@ -24,6 +24,7 @@ class MainController extends Controller
                 $this->logStreamChangedEvent($userId, $request->get('data'));
                 break;
             case 'new_follower':
+                Log::info($userId);
                 $this->logNewFollowerEvent($userId, $request->get('data'));
                 break;
             default:
