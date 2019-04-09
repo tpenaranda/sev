@@ -11,6 +11,20 @@
 |
 */
 
-Route::get('/', function () {
-    return view('home');
+Route::get('/', function () { return view('home'); })->name('home');
+
+// Twitch
+Route::group(['namespace' => 'Twitch'], function () {
+
+    // Login
+    Route::group(['prefix' => 'login/twitch'], function () {
+        Route::get('', 'LoginController@redirectToProvider');
+        Route::get('callback', 'LoginController@handleProviderCallback')->name('twitch_oauth2_callback_url');
+    });
+
+    // Webhooks
+    Route::group(['prefix' => 'twitch'], function () {
+        Route::post('listen', 'MainController@listen');
+        Route::match(['post', 'get'], 'webhooks', 'MainController@handleWebhook')->name('twitch.webhook');
+    });
 });
