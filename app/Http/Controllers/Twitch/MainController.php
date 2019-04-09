@@ -30,7 +30,7 @@ class MainController extends Controller
             return response()->json(['error' => 'Username not found.'], Response::HTTP_BAD_REQUEST);
         }
 
-        if (empty($result = $client->submitToWebhookStreamChanged($user))) {
+        if (!$client->submitToWebhookStreamChanged($user)) {
             return response()->json(['error' => "Sorry, can't create the event listener right now"], Response::HTTP_NOT_ACCEPTABLE);
         }
 
