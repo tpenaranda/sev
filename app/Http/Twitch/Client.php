@@ -4,7 +4,7 @@ namespace App\Http\Twitch;
 
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Response;
-use Redis, stdClass;
+use Cache, Redis, stdClass;
 
 class Client extends GuzzleClient
 {
@@ -38,9 +38,11 @@ class Client extends GuzzleClient
 
     public function getUserObjectByUsername(string $username): ? stdClass
     {
-        $response = $this->request('GET', "{$this->helixBaseUrl}/users?login={$username}", ['headers' => ['Client-ID' => $this->clientId]])->getBody()->getContents();
+        return Cache::remember("user_object_for_username:{$username}", $minutes = 30, function () use ($username) {
+            $response = $this->request('GET', "{$this->helixBaseUrl}/users?login={$username}", ['headers' => ['Client-ID' => $this->clientId]])->getBody()->getContents();
 
-        return json_decode($response)->data[0] ?? null;
+            return json_decode($response)->data[0] ?? null;
+        });
     }
 
     protected function requestSubmitToWebhook(array $params = [], int $leaseSeconds = 864000): bool
@@ -64,7 +66,7 @@ class Client extends GuzzleClient
     {
         $params = [
             'hub.topic' => "{$this->helixBaseUrl}/users/follows?first=1&to_id={$user->id}",
-            'hub.callback' => route('twitch.webhook') . "?user_id={$user->id}",
+            'hub.callback' => route('twitch.webhook') . "?user_id={$user->id}&type=new_follower",
         ];
 
         return $this->requestSubmitToWebhook($params, $leaseSeconds);
@@ -74,7 +76,7 @@ class Client extends GuzzleClient
     {
         $params = [
             'hub.topic' => "{$this->helixBaseUrl}/streams?user_id={$user->id}",
-            'hub.callback' => route('twitch.webhook') . "?user_id={$user->id}",
+            'hub.callback' => route('twitch.webhook') . "?user_id={$user->id}&type=stream_changed",
         ];
 
         return $this->requestSubmitToWebhook($params, $leaseSeconds);

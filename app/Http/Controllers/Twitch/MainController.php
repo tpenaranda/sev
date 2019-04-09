@@ -5,10 +5,59 @@ namespace App\Http\Controllers\Twitch;
 use App\Http\Controllers\Controller;
 use App\Http\Twitch\Client;
 use Illuminate\Http\{Request, Response};
-use Log;
+use Log, Redis;
 
 class MainController extends Controller
 {
+    protected function handleWebhook(Request $request)
+    {
+        $userId = $request->get('user_id');
+        $type = $request->get('type');
+
+        if (empty($userId) || empty($type)) {
+            return Log::info("Missing data when handling webhook.", $request);
+        }
+
+        switch ($type) {
+            case 'stream_changed':
+                $this->logStreamChangedEvent($userId, $request->get('data'));
+                break;
+            case 'new_follower':
+                $this->logNewFollowerEvent($userId, $request->get('data'));
+                break;
+            default:
+                break;
+        }
+
+        return true;
+    }
+
+    protected function logStreamChangedEvent(int $userId, array $data = [])
+    {
+        if (!empty($data[0]['type']) && $data[0]['type'] === 'live') {
+            $description = 'Stream went online';
+            $done_at = $data[0]['started_at'];
+        } else {
+            $description = 'Stream went offline';
+            $done_at = now()->format('c');
+        }
+
+        return $this->logEvent(compact('description', 'done_at'));
+    }
+
+    protected function logNewFollowerEvent(int $userId, array $data = [])
+    {
+        $description = "Streamer is now followed by username {$data[0]['from_name']}";
+        $done_at = $data[0]['followed_at'];
+
+        return $this->logEvent(compact('description', 'done_at'));
+    }
+
+    protected function logEvent(int $userId, array $data = [])
+    {
+        return Redis::rpush("webhook_events_user_id:{$userId}", json_encode($data));
+    }
+
     public function setWebhook(Request $request)
     {
         $client = app(Client::class);
@@ -29,22 +78,25 @@ class MainController extends Controller
 
     public function getWebhooks(Request $request)
     {
-        return response()->json(['data' => []]);
+        if (empty($streamer = session('favorite_streamer'))) {
+            return response()->json(['data' => []]);
+        }
+
+        $userId = app(Client::class)->getUserObjectByUsername($streamer)->id;
+
+        $events = Redis::lrange("webhook_events_user_id:{$userId}", 0, 9);
+
+        return response()->json(['data' => $events]);
     }
 
     public function verifyWebhook(Request $request)
     {
-        Log::info('Webhook verification requested');
-
-        Log::info($request);
-
         return response($request->get('hub_challenge', ''), Response::HTTP_ACCEPTED);
     }
 
     public function receiveWebhook(Request $request)
     {
-        Log::info('Receive');
-        Log::info($request);
+        $this->handleWebhook($request);
 
         return response('Got it, thanks!');
     }

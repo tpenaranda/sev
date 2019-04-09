@@ -88,7 +88,6 @@
         },
         mounted () {
             this.instanceChatClient()
-            this.pullWebhookLogs()
         },
         computed: {
             connect_button_text () {
@@ -201,6 +200,7 @@
                     this.messages = []
                     this.chat.enabled = true
                     this.setLiveStreamChannel()
+                    this.pullWebhookLogs()
                 }).catch((error) => {
                     this.request.message = error.response.data.error || 'Ups, something went wrong!'
                     this.streamer = null
