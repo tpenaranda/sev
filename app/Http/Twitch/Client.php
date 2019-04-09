@@ -43,7 +43,7 @@ class Client extends GuzzleClient
         return json_decode($response)->data[0] ?? null;
     }
 
-    public function submitToWebhookStreamChanged(stdClass $user, int $leaseSeconds = 600): bool
+    public function submitToWebhookStreamChanged(stdClass $user, int $leaseSeconds = 86400): bool
     {
         $form_params = [
             'hub.callback' => route('twitch.webhook'),
