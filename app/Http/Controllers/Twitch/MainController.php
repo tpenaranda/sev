@@ -15,7 +15,8 @@ class MainController extends Controller
         $type = $request->get('type');
 
         if (empty($userId) || empty($type)) {
-            return Log::info("Missing data when handling webhook.", $request);
+            Log::info('Missing data when handling webhook.');
+            return false;
         }
 
         switch ($type) {
@@ -96,6 +97,9 @@ class MainController extends Controller
 
     public function receiveWebhook(Request $request)
     {
+        Log::info('receiveWebhook');
+        Log::info($request);
+
         $this->handleWebhook($request);
 
         return response('Got it, thanks!');
