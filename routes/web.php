@@ -29,7 +29,7 @@ Route::group(['namespace' => 'Twitch'], function () {
 
         Route::group(['prefix' => 'webhooks'], function () {
             Route::get('', 'MainController@verifyWebhook');
-            Route::post('', 'MainController@receiveWebhook')->name('twitch.webhook');
+            Route::match(['post', 'put'], 'MainController@receiveWebhook')->name('twitch.webhook');
         });
     });
 });

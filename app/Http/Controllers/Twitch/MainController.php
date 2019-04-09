@@ -36,6 +36,7 @@ class MainController extends Controller
     {
         Log::info('Verify');
         Log::info($request);
+        Log::info($request->get('hub.challenge'));
 
         return response($request->get('hub.challenge'));
     }
