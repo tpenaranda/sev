@@ -24,7 +24,6 @@ class MainController extends Controller
                 $this->logStreamChangedEvent($userId, $request->get('data'));
                 break;
             case 'new_follower':
-                Log::info($userId);
                 $this->logNewFollowerEvent($userId, $request->get('data'));
                 break;
             default:
@@ -44,7 +43,7 @@ class MainController extends Controller
             $done_at = now()->format('c');
         }
 
-        return $this->logEvent(compact('description', 'done_at'));
+        return $this->logEvent($userId, compact('description', 'done_at'));
     }
 
     protected function logNewFollowerEvent(int $userId, array $data = [])
@@ -52,7 +51,7 @@ class MainController extends Controller
         $description = "Streamer is now followed by username {$data[0]['from_name']}";
         $done_at = $data[0]['followed_at'];
 
-        return $this->logEvent(compact('description', 'done_at'));
+        return $this->logEvent($userId, compact('description', 'done_at'));
     }
 
     protected function logEvent(int $userId, array $data = [])
