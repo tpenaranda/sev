@@ -123,6 +123,9 @@
                     options: {
                         clientId: this.clientId,
                     },
+                    connection: {
+                        secure: true
+                    },
                     identity: {
                         username: 'You',
                         password: `oauth:${this.accessToken}`
