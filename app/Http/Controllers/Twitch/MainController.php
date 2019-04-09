@@ -9,19 +9,7 @@ use Log;
 
 class MainController extends Controller
 {
-    public function receiveWebhook(Request $request)
-    {
-        Log::info($request);
-
-        return response($request->get('hub.challenge'));
-    }
-
-    public function getWebhooks(Request $request)
-    {
-        return response()->json(['data' => []]);
-    }
-
-    public function listen(Request $request)
+    public function setWebhook(Request $request)
     {
         $client = app(Client::class);
         $favorite_streamer = $request->streamer;
@@ -37,5 +25,26 @@ class MainController extends Controller
         session(compact('favorite_streamer'));
 
         return response()->json(['data' => []], Response::HTTP_ACCEPTED);
+    }
+
+    public function getWebhooks(Request $request)
+    {
+        return response()->json(['data' => []]);
+    }
+
+    public function verifyWebhook(Request $request)
+    {
+        Log::info('Verify');
+        Log::info($request);
+
+        return response($request->get('hub.challenge'));
+    }
+
+    public function receiveWebhook(Request $request)
+    {
+        Log::info('Receive');
+        Log::info($request);
+
+        return response('Got it, thanks!');
     }
 }
