@@ -37,7 +37,7 @@
                 </div>
                 <div v-else class="card-body">Nothing here.</div>
             </div>
-            <div v-if="accessToken && chat.enabled" class="card col-md-8 px-0 mt-3">
+            <div v-if="accessToken && chat.enabled" class="card col-md-8 px-0 mt-3 mb-3">
                 <div class="card-header">
                     <span>Chat</span>
                     <span v-if="chat.connected">
