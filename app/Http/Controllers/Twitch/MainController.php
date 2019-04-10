@@ -75,7 +75,7 @@ class MainController extends Controller
 
         session(compact('favorite_streamer'));
 
-        return response()->json(['data' => []], Response::HTTP_ACCEPTED);
+        return response()->json(['data' => ['user' => $user]], Response::HTTP_ACCEPTED);
     }
 
     public function getWebhooks(Request $request)

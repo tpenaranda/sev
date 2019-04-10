@@ -2,12 +2,12 @@
     <div class="container">
         <div class="row justify-content-center pt-4">
             <div class="card col-md-8 px-0">
-                <div class="card-header">Streamer Event Viewer</div>
+                <div class="card-header">Favorite Streamer</div>
                 <div class="card-body text-center">
                     <div v-if="accessToken" class="text-center">
-                        <label for="favorite_streamer" class="pr-2">Favorite Streamer:</label>
-                        <input type="text" class="text-center" v-model="streamer" name="favorite_streamer">
-                        <button class="btn-primary ml-2 px-4" @click="setFavoriteStreamer" :disabled="request.inProgress || !streamer">{{ set_button_text }}</button>
+                        <img v-if="streamer.profile_image_url" class="mr-2" :src="streamer.profile_image_url" :alt="streamer.login" height="40" width="40"/>
+                        <input type="text" class="text-center" v-model="streamer.login" name="favorite_streamer">
+                        <button class="btn-primary ml-2 px-4" @click="setFavoriteStreamer" :disabled="request.inProgress || !streamer.login">{{ set_button_text }}</button>
                         <div class="pt-2">{{ request.message }}</div>
                     </div>
                     <button v-else class="btn-primary" @click="loginWithTwitch">
@@ -76,7 +76,10 @@
         },
         data () {
             return {
-                streamer: this.favoriteStreamer,
+                streamer: {
+                    login: this.favoriteStreamer,
+                    profile_image_url: null
+                },
                 request: {
                     inProgress: false,
                     message: null,
@@ -102,7 +105,7 @@
         },
         mounted () {
             this.instanceChatClient()
-            if (this.streamer) {
+            if (this.streamer.login) {
                 this.setFavoriteStreamer()
             }
         },
@@ -111,7 +114,7 @@
                 return this.chat.connecting ? 'Connecting...' : 'Connect'
             },
             set_button_text () {
-                return this.request.inProgress ? 'Setting...' : 'Set'
+                return this.request.inProgress ? 'Loading...' : 'Watch'
             }
         },
         methods: {
@@ -130,34 +133,24 @@
                 this.livestream.player = new Twitch.Player('livestream', {width: 640, height: 480, channel: channel})
             },
             setLiveStreamChannel () {
-                if (!this.livestream.player) {
-                    this.instanceLiveStream(this.streamer)
+                if (this.livestream.player) {
+                    this.livestream.player.setChannel(this.streamer.login)
                 } else {
-                    this.livestream.player.setChannel(this.streamer)
+                    this.instanceLiveStream(this.streamer.login)
                 }
-
                 this.livestream.show = true
             },
             instanceChatClient () {
                 let opts = {
-                    options: {
-                        clientId: this.clientId,
-                    },
-                    connection: {
-                        secure: true
-                    },
-                    identity: {
-                        username: 'You',
-                        password: `oauth:${this.accessToken}`
-                    },
+                    options: { clientId: this.clientId },
+                    connection: { secure: true },
+                    identity: { username: 'You', password: `oauth:${this.accessToken}` },
                     channels: [ this.streamer ]
                 }
 
                 this.chat.client = new tmi.client(opts);
 
-                this.chat.client.on('connecting', () => {
-                    this.chat.connecting = true
-                })
+                this.chat.client.on('connecting', () => { this.chat.connecting = true })
 
                 this.chat.client.on('connected', () => {
                     this.chat.connected = true
@@ -171,9 +164,7 @@
                 })
 
                 this.chat.client.on('message', (channel, userstate, message, self) => {
-                    if (self) {
-                        return false
-                    }
+                    if (self) { return false }
 
                     switch(userstate["message-type"]) {
                         case "chat":
@@ -186,11 +177,7 @@
                 });
             },
             appendChatMessage (username, message = '') {
-                this.chat.messages.push({
-                    username: username,
-                    message: message
-                })
-
+                this.chat.messages.push({ username: username, message: message })
                 this.chat.messages = this.chat.messages.slice(-10)
             },
             chatConnect () {
@@ -200,12 +187,10 @@
             sendChatMessage () {
                 let message = this.chat.message.valueOf()
 
-                this.chat.client.say(this.streamer, message).then(() => {
-                    this.chat.messages.push({
-                        username: 'You',
-                        message: message
-                    })
+                this.chat.client.say(this.streamer.login, message).then(() => {
+                    this.chat.messages.push({ username: 'You', message: message })
                 })
+
                 this.chat.message = ''
             },
             loginWithTwitch () {
@@ -213,8 +198,12 @@
             },
             setFavoriteStreamer () {
                 this.request.inProgress = true
-                axios.post('/twitch/listen', {streamer: this.streamer}).then((response) => {
+                this.streamer.profile_image_url = null
+
+                axios.post('/twitch/listen', {streamer: this.streamer.login}).then((response) => {
                     this.request.message = 'Cool, BE events listenerers created!'
+                    this.streamer.login = response.data.data.user.login
+                    this.streamer.profile_image_url = response.data.data.user.profile_image_url
                     if (this.chat.connected) {
                         this.chat.client.disconnect()
                     }
@@ -224,7 +213,7 @@
                     this.pullWebhookLogs()
                 }).catch((error) => {
                     this.request.message = error.response.data.error || 'Ups, something went wrong!'
-                    this.streamer = null
+                    this.streamer.login = null
                 }).finally(() => {
                     this.request.inProgress = false
                     setTimeout(() => {
