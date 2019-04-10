@@ -107,7 +107,7 @@
         mounted () {
             this.instanceChatClient()
 
-            if (this.streamer.login) {
+            if (this.streamer.login && this.accessToken) {
                 this.setFavoriteStreamer()
             }
         },
