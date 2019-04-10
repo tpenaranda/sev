@@ -215,7 +215,7 @@
             setFavoriteStreamer () {
                 this.request.inProgress = true
                 axios.post('/twitch/listen', {streamer: this.streamer}).then((response) => {
-                    this.request.message = 'BE Listener created!'
+                    this.request.message = 'Cool, BE events listenerers created!'
                     if (this.chat.connected) {
                         this.chat.client.disconnect()
                     }
