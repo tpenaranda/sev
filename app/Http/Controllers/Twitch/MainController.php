@@ -86,7 +86,7 @@ class MainController extends Controller
 
         $userId = app(Client::class)->getUserObjectByUsername($streamer)->id;
 
-        $events = Redis::lrange("webhook_events_user_id:{$userId}", 0, 9);
+        $events = array_reverse(Redis::lrange("webhook_events_user_id:{$userId}", 0, 9));
 
         return response()->json(['data' => array_map(function ($i) { return json_decode($i); }, $events)]);
     }
