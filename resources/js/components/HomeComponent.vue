@@ -52,7 +52,7 @@
                         <b>{{ message.username   }}</b>: {{ message.message }}
                     </div>
                     <div class="text-center pt-2">
-                        <input type="text" class="text-right" v-model="chat.message" name="chat_message" maxlength="64" size="64">
+                        <input type="text" class="text-right" v-model="chat.message" name="chat_message" maxlength="64" style="width: 60%">
                         <button class="btn-primary" @click="sendChatMessage" :disabled="!chat.message">Send!</button>
                     </div>
                 </div>
