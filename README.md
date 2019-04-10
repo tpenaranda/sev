@@ -6,18 +6,21 @@
 > You are not expected to (cumulatively) spend more than *4* hours on this task.
 
 Well... call me dumb but I spent about 3 days on this, and, I didn't wrote a line of code before the second day.
-Maybe because I'm new to gaming and Twitch, but for my perspective there is no chance to get an MVP in 4hs here.
+Maybe because I'm new to gaming and Twitch, but from my perspective there is no chance to get an MVP in 4hs here.
 
 > Ability to navigate third-party interfaces (libraries/apis) where the documentation/spec might not be very detailed
 
-Not detailed and a pain to use! God! Can't belive they call 'new api' and 'v5 api'. How the hell tags 'new' an api?.
-"New" is going to became "old", soon or later... I'm wondering if twitch api git tags/branches are named 'new' haha.
-Nothing standarized, non descriptive responses, lack of features and so on.
+Not detailed and a pain to use! God! Can't believe they call 'new api' and 'v5 api'. Who the hell tags 'new' an API?.
+I mean, "New" is going to became "Old", soon or later... I'm wondering if twitch api git tags/branches are named 'new' haha.
+Versions please. Helix, old, new, kraken, v5... come on. Be consistent. As a plus... nothing standarized, non descriptive
+responses, lack of features and so on hehe.
 
 > Link to live demo (heroku tends to be pretty easy/free and is used by most people)
-Since I used Laravel/VueJS, the app is being deployed using Forge. Official Laravel product. [Link](https://sev.xenir.com.ar)
+
+Since I used Laravel/VueJS, the app is being deployed using Forge (official Laravel product). [Live demo](https://sev.xenir.com.ar)
 
 > Link to git repo (Github is a famous choice) consisting your source and `README`
+
 [Here](https://github.com/tpenaranda/sev)
 
 > The first/home page lets a user login with Twitch and set their favorite Twitch streamer name.
