@@ -105,6 +105,7 @@
         },
         mounted () {
             this.instanceChatClient()
+
             if (this.streamer.login) {
                 this.setFavoriteStreamer()
             }
@@ -130,7 +131,7 @@
                 })
             },
             instanceLiveStream (channel) {
-                this.livestream.player = new Twitch.Player('livestream', {width: 640, height: 480, channel: channel})
+                this.livestream.player = new Twitch.Player('livestream', {width: "100%", channel: channel})
             },
             setLiveStreamChannel () {
                 if (this.livestream.player) {
@@ -145,7 +146,7 @@
                     options: { clientId: this.clientId },
                     connection: { secure: true },
                     identity: { username: 'You', password: `oauth:${this.accessToken}` },
-                    channels: [ this.streamer ]
+                    channels: [ this.streamer.login ]
                 }
 
                 this.chat.client = new tmi.client(opts);
@@ -211,6 +212,7 @@
                     this.chat.enabled = true
                     this.setLiveStreamChannel()
                     this.pullWebhookLogs()
+                    this.chatConnect()
                 }).catch((error) => {
                     this.request.message = error.response.data.error || 'Ups, something went wrong!'
                     this.streamer.login = null
