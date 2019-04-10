@@ -57,7 +57,7 @@ class MainController extends Controller
 
     protected function logEvent(int $userId, array $data = [])
     {
-        return Redis::rpush("webhook_events_user_id:{$userId}", json_encode($data));
+        return Redis::lpush("webhook_events_user_id:{$userId}", json_encode($data));
     }
 
     public function setWebhook(Request $request)
