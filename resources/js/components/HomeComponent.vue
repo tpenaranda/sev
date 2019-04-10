@@ -1,6 +1,7 @@
 <template>
     <div class="container">
-        <div class="row justify-content-center pt-4">
+        <h1 class="text-center pt-4">Stream Event Viewer</h1>
+        <div class="row justify-content-center pt-2">
             <div class="card col-md-8 px-0">
                 <div class="card-header">Favorite Streamer</div>
                 <div class="card-body text-center">
@@ -8,7 +9,7 @@
                         <img v-if="streamer.profile_image_url" class="mr-2" :src="streamer.profile_image_url" :alt="streamer.login" height="40" width="40"/>
                         <input type="text" class="text-center" v-model="streamer.login" name="favorite_streamer">
                         <button class="btn-primary ml-2 px-4" @click="setFavoriteStreamer" :disabled="request.inProgress || !streamer.login">{{ set_button_text }}</button>
-                        <div class="pt-2">{{ request.message }}</div>
+                        <div class="pt-2 text-success">{{ request.message }}</div>
                     </div>
                     <button v-else class="btn-primary" @click="loginWithTwitch">
                         <svg class="tw-svg__asset tw-svg__asset--inherit tw-svg__asset--logoglitch" width="24px" height="24px" version="1.1" viewBox="0 0 30 30" x="0px" y="0px">
