@@ -62,7 +62,7 @@ class Client extends GuzzleClient
         return $response->getStatusCode() == Response::HTTP_ACCEPTED;
     }
 
-    public function submitToWebhookNewFollower(stdClass $user, int $leaseSeconds = 86400): bool
+    public function submitToWebhookNewFollower(stdClass $user, int $leaseSeconds = 259200): bool
     {
         $params = [
             'hub.topic' => "{$this->helixBaseUrl}/users/follows?first=1&to_id={$user->id}",
@@ -72,7 +72,7 @@ class Client extends GuzzleClient
         return $this->requestSubmitToWebhook($params, $leaseSeconds);
     }
 
-    public function submitToWebhookStreamChanged(stdClass $user, int $leaseSeconds = 86400): bool
+    public function submitToWebhookStreamChanged(stdClass $user, int $leaseSeconds = 259200): bool
     {
         $params = [
             'hub.topic' => "{$this->helixBaseUrl}/streams?user_id={$user->id}",
