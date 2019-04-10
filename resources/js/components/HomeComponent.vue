@@ -24,16 +24,17 @@
                     <div id="livestream"></div>
                 </div>
             </div>
-            <div class="card col-md-8 px-0 mt-3" v-if="webhooks.length">
+            <div class="card col-md-8 px-0 mt-3" v-if="webhooks.show">
                 <div class="card-header">
                     <span>Logged Events (Server side)</span>
-                    <button class="btn-primary ml-2 px-4" @click="pullWebhookLogs">Refresh</button>
+                    <button v-if="!webhooks.loading" class="btn-primary ml-2 px-4" @click="pullWebhookLogs">Pull server</button>
                 </div>
-                <div class="card-body">
-                    <div v-for="webhook in webhooks">
-                        <i>{{ webhook.done_at  }}</i> {{ webhook.description }}
+                <div v-if="webhooks.items.length" class="card-body">
+                    <div v-for="webhook in webhooks.items">
+                        <b>{{ webhook.done_at | formatDoneAt }}</b>: {{ webhook.description }}
                     </div>
                 </div>
+                <div v-else class="card-body">Nothing here.</div>
             </div>
             <div v-if="accessToken && chat.enabled" class="card col-md-8 px-0 mt-3">
                 <div class="card-header">
@@ -60,12 +61,20 @@
 </template>
 
 <script>
+    import moment from 'moment-timezone'
+
     export default {
         props: [
             'accessToken',
             'clientId',
             'favoriteStreamer'
         ],
+        filters: {
+            formatDoneAt (value) {
+                let output = moment(value).fromNow()
+                return output.charAt(0).toUpperCase() + output.slice(1)
+            }
+        },
         data () {
             return {
                 streamer: this.favoriteStreamer,
@@ -85,11 +94,18 @@
                     show: false,
                     player: null
                 },
-                webhooks: []
+                webhooks: {
+                    items: [],
+                    loading: null,
+                    show: false
+                }
             }
         },
         mounted () {
             this.instanceChatClient()
+            if (this.streamer) {
+                this.setFavoriteStreamer()
+            }
         },
         computed: {
             connect_button_text () {
@@ -101,10 +117,14 @@
         },
         methods: {
             pullWebhookLogs () {
+                this.webhooks.loading = true
                 axios.get('/twitch/listen').then((response) => {
-                    this.webhooks = response.data.data
+                    this.webhooks.items = response.data.data
+                    this.webhooks.show = true
                 }).catch((error) => {
-                    this.webhooks = []
+                    this.webhooks.items = []
+                }).finally(() => {
+                    this.webhooks.loading = false
                 })
             },
             instanceLiveStream (channel) {
@@ -210,7 +230,7 @@
                     this.request.inProgress = false
                     setTimeout(() => {
                         this.request.message = null
-                    }, 5000)
+                    }, 3000)
                 })
             }
         }
