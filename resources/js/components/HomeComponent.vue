@@ -71,8 +71,7 @@
         ],
         filters: {
             formatDoneAt (value) {
-                let output = moment(value).fromNow()
-                return output.charAt(0).toUpperCase() + output.slice(1)
+                return moment.tz(value, 'UTC').tz(moment.tz.guess()).format('MMMM Do YYYY, h:mm:ss a')
             }
         },
         data () {

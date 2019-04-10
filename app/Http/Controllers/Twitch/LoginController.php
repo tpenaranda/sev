@@ -12,7 +12,6 @@ class LoginController extends Controller
     {
         $params = [
             'client_id' => config('twitch.client_id'),
-            'force_verify' => 'true',
             'redirect_uri' => route('twitch_oauth2_callback_url'),
             'response_type' => 'code',
             'scope' => 'user:read:email chat:read chat:edit',
